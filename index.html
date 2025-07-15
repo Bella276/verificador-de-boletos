@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verificación de Boleto</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F4F4F9;
+    margin: 0;
+    padding: 30px 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    background: #fff;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 360px;
+    padding: 30px 25px 40px;
+    box-shadow: 0 2px 20px rgb(0 0 0 / 0.1);
+    text-align: center;
+  }
+  .logo {
+    width: 180px;
+    margin-bottom: 25px;
+  }
+  h1 {
+    font-weight: 800;
+    font-size: 1.6rem;
+    margin: 0 0 6px 0;
+    color: #004080;
+  }
+  .subtitle {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #0288d1;
+    margin-bottom: 10px;
+  }
+  .agent {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #004080;
+    margin-bottom: 25px;
+  }
+  input[type="text"] {
+    width: 100%;
+    font-size: 1.05rem;
+    padding: 12px 15px;
+    border: 2px solid #0288d1;
+    border-radius: 8px;
+    margin-bottom: 22px;
+    transition: all 0.25s ease-in-out;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #004080;
+    box-shadow: 0 0 8px #80bfff;
+  }
+  button {
+    width: 100%;
+    background-color: #0288d1;
+    border: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.2rem;
+    padding: 14px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #005288;
+  }
+  .result {
+    margin-top: 30px;
+    font-weight: 700;
+    font-size: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    user-select: none;
+  }
+  .result p {
+    margin: 4px 0;
+  }
+  .result.valid {
+    color: #4CAF50; /* verde */
+  }
+  .result.invalid {
+    color: #f44336; /* rojo */
+  }
+  .emoji {
+    font-size: 1.8rem;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <img class="logo" src="https://i.postimg.cc/Y9QSnzfc/Chat-GPT-Image-13-jul-2025-11-00-18-p-m.png" alt="Logo Yanira Matos" />
+    <h1>Verificación de Boleto</h1>
+    <div class="subtitle">PA’ PUNTA CANA CON TODO INCLUIDO!!</div>
+    <div class="agent">Yanira Matos – Agente de Viajes</div>
+    <input id="inputBoleto" type="text" placeholder="Ingresa número o ID del boleto" />
+    <button onclick="verificar()">Verificar</button>
+    <div id="resultado" class="result"></div>
+  </div>
+
+<script>
+  const URL_API = 'https://script.google.com/macros/s/AKfycbwayK5-9JqswvN1TXKP0cJUInfj1eKPF8s0IWvIivpKuuyzyoJ2spozYCCQOIRnqI7cpw/exec';
+
+  async function verificar() {
+    const input = document.getElementById('inputBoleto').value.trim();
+    const resultadoDiv = document.getElementById('resultado');
+    resultadoDiv.textContent = '';
+    resultadoDiv.className = 'result';
+
+    if (!input) {
+      resultadoDiv.innerHTML = '<span class="emoji">⚠️</span><p>Por favor, ingresa un número o ID válido.</p>';
+      resultadoDiv.classList.add('invalid');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${URL_API}?q=${encodeURIComponent(input)}`);
+      const data = await response.json();
+
+      if (data.existe) {
+        resultadoDiv.innerHTML = `
+          <span class="emoji">✅🎉</span>
+          <p>Boleto válido</p>
+          <p>Número: ${data.numero}</p>
+          <p>ID: ${data.id}</p>
+        `;
+        resultadoDiv.classList.add('valid');
+      } else {
+        resultadoDiv.innerHTML = `
+          <span class="emoji">❌</span>
+          <p>${data.mensaje || "Este boleto no existe"}</p>
+        `;
+        resultadoDiv.classList.add('invalid');
+      }
+    } catch (error) {
+      resultadoDiv.innerHTML = '<span class="emoji">⚠️</span><p>Error al verificar el boleto. Intenta nuevamente.</p>';
+      resultadoDiv.classList.add('invalid');
+    }
+  }
+</script>
